@@ -70,11 +70,9 @@ rb_epeg_finish(obj)
 	VALUE retval;
 	if(OBJ_FROZEN(obj)) {
 		rb_raise(rb_eStandardError, "Epeg finished");
-		return Qfalse;
 	}
 	if(!RTEST(rb_ivar_get(obj, idvalid))) {
 		rb_raise(rb_eStandardError, "I don't know what to do");
-		return Qfalse;
 	}
 	Data_Get_Struct(obj, Epeg_Image, image);
 	epeg_close(image);
