@@ -2,7 +2,7 @@
 #include <intern.h>
 #include <Epeg.h>
 
-VALUE mEpeg;
+VALUE cEpeg;
 
 static VALUE rb_epeg_thumbnail(klass, fname, x, y)
 	VALUE klass, fname, x, y;
@@ -29,7 +29,20 @@ static VALUE rb_epeg_thumbnail(klass, fname, x, y)
 	return retval;
 }
 
+static VALUE
+rb_epeg_new(klass, fname)
+	VALUE klass, fname;
+{
+	VALUE retval;
+	Epeg_Image *image;
+	image = epeg_file_open(StringValueCStr(fname));
+	retval = Data_Wrap_Struct(klass, NULL, epeg_close, image);
+	rb_obj_call_init(retval, 0, NULL);
+	return retval;
+}
+
 void Init_epeg () {
-	mEpeg = rb_define_module("Epeg");
-	rb_define_singleton_method(mEpeg, "thumbnail", rb_epeg_thumbnail, 3);
+	cEpeg = rb_define_class("Epeg", rb_cObject);
+	rb_define_singleton_method(cEpeg, "thumbnail", rb_epeg_thumbnail, 3);
+	rb_define_singleton_method(cEpeg, "new", rb_epeg_new, 1);
 }
