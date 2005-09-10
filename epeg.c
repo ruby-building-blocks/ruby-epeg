@@ -75,19 +75,43 @@ rb_epeg_set_output_size(obj, x, y)
 }
 
 static VALUE
-rb_epeg_finish(obj)
+rb_epeg_finish(argc, args, obj)
+	int argc;
+	VALUE *args;
 	VALUE obj;
 {
 	Epeg_Image *image;
 	VALUE retval;
+	unsigned char *data;
+	int size;
+
 	if(OBJ_FROZEN(obj)) {
 		rb_raise(rb_eStandardError, "Epeg finished");
 	}
 
 	Data_Get_Struct(obj, Epeg_Image, image);
+
+	if(argc == 0) { // Return as string
+		epeg_memory_output_set(image, &data, &size);
+	} else if(argc == 1) { // Filename
+		Check_Type(args[0], T_STRING);
+		epeg_file_output_set(image, RSTRING(args[0])->ptr);
+	} else {
+		rb_raise(rb_eRuntimeError, "invalid arguments");
+	}
+
+	if(epeg_encode(image) != 0) {
+		rb_raise(rb_eStandardError, "Can't encode image");
+	}
 	epeg_close(image);
 	OBJ_FREEZE(obj);
-	return obj;
+	if(argc == 0) {
+		retval = rb_str_new(data, size);
+		free(data);
+		return retval;
+	} else {
+		return Qnil;
+	}
 }
 
 void Init_epeg () {
@@ -98,5 +122,5 @@ void Init_epeg () {
 	rb_define_singleton_method(cEpeg, "new", rb_epeg_new, 1);
 	rb_define_method(cEpeg, "size", rb_epeg_get_size, 0);
 	rb_define_method(cEpeg, "set_output_size", rb_epeg_set_output_size, 2);
-	rb_define_method(cEpeg, "finish", rb_epeg_finish, 0);
+	rb_define_method(cEpeg, "finish", rb_epeg_finish, -1);
 }

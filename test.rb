@@ -20,10 +20,9 @@ class TestEpeg < Test::Unit::TestCase
 		@epeg.finish
 		assert_raises(StandardError) { @epeg.set_output_size(16,16) }
 	end
-end
-
-class TestEpegSingleton < Test::Unit::TestCase
-	def test_1
-		assert(Epeg.thumbnail('test.jpg', 128, 128).size > 200)
+	def test_finish_return
+		@epeg.set_output_size(128,128)
+		assert_equal(Epeg.thumbnail('test.jpg', 128, 128), @epeg.finish)
 	end
 end
+
