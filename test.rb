@@ -15,6 +15,11 @@ class TestEpeg < Test::Unit::TestCase
 		assert(@epeg.finish)
 		assert_raises(StandardError) { @epeg.finish }
 	end
+	def test_output_size
+		assert_nothing_raised { @epeg.set_output_size(16,16) }
+		@epeg.finish
+		assert_raises(StandardError) { @epeg.set_output_size(16,16) }
+	end
 end
 
 class TestEpegSingleton < Test::Unit::TestCase

@@ -63,6 +63,20 @@ rb_epeg_get_size(obj)
 }
 
 static VALUE
+rb_epeg_set_output_size(obj, x, y)
+	VALUE obj, x, y;
+{
+	Epeg_Image *image;
+	VALUE retval;
+	if(OBJ_FROZEN(obj)) {
+		rb_raise(rb_eStandardError, "can't set size now");
+	}
+	Data_Get_Struct(obj, Epeg_Image, image);
+	epeg_decode_size_set(image, NUM2INT(x), NUM2INT(y));
+	return Qnil;
+}
+
+static VALUE
 rb_epeg_finish(obj)
 	VALUE obj;
 {
@@ -88,5 +102,6 @@ void Init_epeg () {
 	rb_define_singleton_method(cEpeg, "thumbnail", rb_epeg_thumbnail, 3);
 	rb_define_singleton_method(cEpeg, "new", rb_epeg_new, 1);
 	rb_define_method(cEpeg, "size", rb_epeg_get_size, 0);
+	rb_define_method(cEpeg, "set_output_size", rb_epeg_set_output_size, 2);
 	rb_define_method(cEpeg, "finish", rb_epeg_finish, 0);
 }
