@@ -5,6 +5,7 @@
 VALUE cEpeg;
 ID idvalid;
 ID idsize;
+ID idclosed;
 
 static VALUE rb_epeg_thumbnail(klass, fname, x, y)
 	VALUE klass, fname, x, y;
@@ -61,11 +62,33 @@ rb_epeg_get_size(obj)
 	return retval;
 }
 
+static VALUE
+rb_epeg_finish(obj)
+	VALUE obj;
+{
+	Epeg_Image *image;
+	VALUE retval;
+	if(OBJ_FROZEN(obj)) {
+		rb_raise(rb_eStandardError, "Epeg finished");
+		return Qfalse;
+	}
+	if(!RTEST(rb_ivar_get(obj, idvalid))) {
+		rb_raise(rb_eStandardError, "I don't know what to do");
+		return Qfalse;
+	}
+	Data_Get_Struct(obj, Epeg_Image, image);
+	epeg_close(image);
+	OBJ_FREEZE(obj);
+	return obj;
+}
+
 void Init_epeg () {
+	idclosed = rb_intern("closed");
 	idvalid = rb_intern("valid");
 	idsize = rb_intern("size");
 	cEpeg = rb_define_class("Epeg", rb_cObject);
 	rb_define_singleton_method(cEpeg, "thumbnail", rb_epeg_thumbnail, 3);
 	rb_define_singleton_method(cEpeg, "new", rb_epeg_new, 1);
 	rb_define_method(cEpeg, "size", rb_epeg_get_size, 0);
+	rb_define_method(cEpeg, "finish", rb_epeg_finish, 0);
 }

@@ -11,6 +11,10 @@ class TestEpeg < Test::Unit::TestCase
 	def test_size
 		assert_equal(@epeg.size, [182, 170])
 	end
+	def test_finish
+		assert(@epeg.finish)
+		assert_raises(StandardError) { @epeg.finish }
+	end
 end
 
 class TestEpegSingleton < Test::Unit::TestCase
