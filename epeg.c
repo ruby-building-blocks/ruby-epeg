@@ -39,7 +39,7 @@ rb_epeg_new(klass, fname)
 	VALUE retval;
 	Epeg_Image *image;
 	image = epeg_file_open(StringValueCStr(fname));
-	retval = Data_Wrap_Struct(klass, NULL, epeg_close, image);
+	retval = Data_Wrap_Struct(klass, NULL, NULL, image);
 	rb_ivar_set(retval, idvalid, Qtrue);
 	rb_obj_call_init(retval, 0, NULL);
 	return retval;
