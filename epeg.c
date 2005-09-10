@@ -3,7 +3,6 @@
 #include <Epeg.h>
 
 VALUE cEpeg;
-ID idvalid;
 ID idsize;
 ID idclosed;
 
@@ -40,7 +39,6 @@ rb_epeg_new(klass, fname)
 	Epeg_Image *image;
 	image = epeg_file_open(StringValueCStr(fname));
 	retval = Data_Wrap_Struct(klass, NULL, NULL, image);
-	rb_ivar_set(retval, idvalid, Qtrue);
 	rb_obj_call_init(retval, 0, NULL);
 	return retval;
 }
@@ -85,9 +83,7 @@ rb_epeg_finish(obj)
 	if(OBJ_FROZEN(obj)) {
 		rb_raise(rb_eStandardError, "Epeg finished");
 	}
-	if(!RTEST(rb_ivar_get(obj, idvalid))) {
-		rb_raise(rb_eStandardError, "I don't know what to do");
-	}
+
 	Data_Get_Struct(obj, Epeg_Image, image);
 	epeg_close(image);
 	OBJ_FREEZE(obj);
@@ -96,7 +92,6 @@ rb_epeg_finish(obj)
 
 void Init_epeg () {
 	idclosed = rb_intern("closed");
-	idvalid = rb_intern("valid");
 	idsize = rb_intern("size");
 	cEpeg = rb_define_class("Epeg", rb_cObject);
 	rb_define_singleton_method(cEpeg, "thumbnail", rb_epeg_thumbnail, 3);
