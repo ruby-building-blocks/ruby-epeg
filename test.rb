@@ -6,7 +6,10 @@ class TestEpeg < Test::Unit::TestCase
 		@epeg = Epeg.new('test.jpg')
 	end
 	def test_new
-		@epeg.class == Epeg
+		assert_equal(Epeg, @epeg.class)
+	end
+	def test_size
+		assert_equal(@epeg.size, [182, 170])
 	end
 end
 

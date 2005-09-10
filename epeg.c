@@ -3,6 +3,8 @@
 #include <Epeg.h>
 
 VALUE cEpeg;
+ID idvalid;
+ID idsize;
 
 static VALUE rb_epeg_thumbnail(klass, fname, x, y)
 	VALUE klass, fname, x, y;
@@ -37,12 +39,33 @@ rb_epeg_new(klass, fname)
 	Epeg_Image *image;
 	image = epeg_file_open(StringValueCStr(fname));
 	retval = Data_Wrap_Struct(klass, NULL, epeg_close, image);
+	rb_ivar_set(retval, idvalid, Qtrue);
 	rb_obj_call_init(retval, 0, NULL);
 	return retval;
 }
 
+static VALUE
+rb_epeg_get_size(obj)
+	VALUE obj;
+{
+	int x, y;
+	Epeg_Image *image;
+	VALUE retval;
+	retval = rb_ivar_get(obj, idsize);
+	if(RTEST(retval))
+		return retval;
+	Data_Get_Struct(obj, Epeg_Image, image);
+	epeg_size_get(image, &x, &y);
+	retval = rb_ary_new3(2, INT2NUM(x), INT2NUM(y));
+	rb_ivar_set(obj, idsize, retval);
+	return retval;
+}
+
 void Init_epeg () {
+	idvalid = rb_intern("valid");
+	idsize = rb_intern("size");
 	cEpeg = rb_define_class("Epeg", rb_cObject);
 	rb_define_singleton_method(cEpeg, "thumbnail", rb_epeg_thumbnail, 3);
 	rb_define_singleton_method(cEpeg, "new", rb_epeg_new, 1);
+	rb_define_method(cEpeg, "size", rb_epeg_get_size, 0);
 }
