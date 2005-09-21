@@ -26,3 +26,17 @@ class TestEpeg < Test::Unit::TestCase
 	end
 end
 
+class TestEpegBad < Test::Unit::TestCase
+	def test_bad_file
+		assert_raises(StandardError) {
+			Epeg.new('/dev/null')
+		}
+	end
+
+	def test_nonexistant_file
+		assert_raises(StandardError) {
+			Epeg.new('/askdfhalskdfhasldfahsdf')
+		}
+	end
+end
+

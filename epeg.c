@@ -20,6 +20,9 @@ static VALUE rb_epeg_thumbnail(klass, fname, x, y)
 	}
 
 	image = epeg_file_open(StringValueCStr(fname));
+	if(!image) {
+		rb_raise(rb_eStandardError, "Can't open image");
+	}
 	epeg_decode_size_set(image, NUM2INT(x), NUM2INT(y));
 	epeg_memory_output_set(image, &data, &size);
 	if(epeg_encode(image) != 0) {
@@ -38,6 +41,9 @@ rb_epeg_new(klass, fname)
 	VALUE retval;
 	Epeg_Image *image;
 	image = epeg_file_open(StringValueCStr(fname));
+	if(!image) {
+		rb_raise(rb_eStandardError, "Can't open image");
+	}
 	retval = Data_Wrap_Struct(klass, NULL, NULL, image);
 	rb_obj_call_init(retval, 0, NULL);
 	return retval;
