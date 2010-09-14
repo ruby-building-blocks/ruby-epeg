@@ -1,5 +1,5 @@
 #include <ruby.h>
-#include <intern.h>
+#include <ruby/intern.h>
 #include <Epeg.h>
 
 VALUE cEpeg;
@@ -101,7 +101,7 @@ rb_epeg_finish(argc, args, obj)
 		epeg_memory_output_set(image, &data, &size);
 	} else if(argc == 1) { // Filename
 		Check_Type(args[0], T_STRING);
-		epeg_file_output_set(image, RSTRING(args[0])->ptr);
+		epeg_file_output_set(image, RSTRING_PTR(args[0]));
 	} else {
 		rb_raise(rb_eRuntimeError, "invalid arguments");
 	}
